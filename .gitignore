@@ -1,0 +1,4 @@
+*.kdev4
+memasta_test
+Makefile
+*.o
