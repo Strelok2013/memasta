@@ -6,18 +6,20 @@
 
 // #define MM_MAX_BUCKET_SIZE 1024
 
-int* mm_alloc(size_t size);
-
-
-void mm_free(int* ptr);
-
 struct mm_seg
 {
      size_t size;
+     int* mem; // memory were pointing to
 };
 
+void mm_free(void* seg);
+
+void* mm_alloc(size_t size);
+
+
+
 // Simple as linked list
-#define list(t_) struct {t_* head; t_* tail;}
+// #define list(t_) struct {t_* head; t_* tail;}
 
 
 
