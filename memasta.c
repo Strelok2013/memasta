@@ -3,91 +3,59 @@
 
 void* mm_alloc(size_t size)
 {
-
-    printf("attempting to allocate %zu bytes of memory \n", size);
-    int *ptr = malloc(size);
-    if(!ptr)
+    if(size == 0)
     {
-        printf("Failed to allocate %zu bytes of memory, out of memory? \n", size);
-    }
-    struct mm_seg* seg = (void*)ptr;
-    seg->mem = ptr;
-    seg->size = size;
-    seg->next = NULL;
-    seg->prev = NULL;
-
-    return seg;
-}
-
-void mm_list_init(struct mm_List l)
-{
-    memset(&l, 0, sizeof l);
-}
-
-void mm_list_push(mm_list *l, struct mm_seg *n)
-{
-    printf("Addr of list in push func: %p \n", &l);
-    if(!n)
-    {
-       return;
-    }
-
-    if(!l->head)
-    {
-        l->head = n;
+        printf("Attempted to allocate 0 Bytes \n");
+        return 0;
     }
     else
     {
-        if(!l->tail)
-        {
-            n->prev = l->head;
-            l->head->next = n;
-            l->tail = n;
-        }
-        else
-        {
-            n->prev = l->tail;
-            l->tail->next = n;
-            l->tail = n;
-        }
-    }
-}
+        printf("Allocating: %zu bytes\n ", size);
 
-void mm_list_pop(mm_list *l)
-{
-    printf("Addr of list in pop func: %p \n", &l);
-    if(!l->tail)
+    int* ptr = malloc(sizeof(struct mm_seg) + size);
+
+    if(!ptr)
     {
-        if(l->head)
-        {
-            mm_free(l->head);
-        }
-        return;
+        return 0;
     }
 
-    l->tail->prev->next = NULL;
-    mm_free(l->tail);
+    struct mm_seg *seg = (void*)ptr;
+    seg->next = NULL;
+    seg->prev = NULL;
+    seg->size = size;
+
+    return seg; // Sane????
+    }
 }
+
+
 
 
 
 void mm_free(void* seg)
 {
-    struct mm_seg* seg_p = (struct mm_seg*) seg;
-    // Potential for some kind of check that checks for pointer type?
-    printf("Freeing %zu bytes of memory \n", seg_p->size);
+    if(!seg)
+    {
+        printf("Attempting to free a null pointer\n");
+        return;
+    }
+    struct mm_seg *seg_p = seg;
+    seg_p->next = NULL; // this shouldn't be done here methinks
+    printf("Freeing %zu bytes of memory\n", seg_p->size);
     free(seg);
+    seg = 0;
 }
 
 int main(void)
 {
-    mm_list list = {0};
-    mm_list_init(list);
+    void* ptr_1 = mm_alloc(0);
+    void* ptr_2 = mm_alloc(16);
+    void* ptr_3 = mm_alloc(64);
 
-    printf("Addr of list: %p \n", &list);
+    mm_free(ptr_1);
+    mm_free(ptr_2);
+    mm_free(ptr_3);
 
-    mm_list_push(&list, mm_alloc(64));
-    mm_list_pop(&list);
 
     printf("End of test \n");
 }
