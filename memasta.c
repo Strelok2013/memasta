@@ -29,7 +29,53 @@ void* mm_alloc(size_t size)
 }
 
 
+void mm_list_init(struct mm_List *l)
+{
+    memset(l, 0, sizeof(mm_list));
+    l->head = NULL;
+    l->tail = NULL;
 
+}
+
+void mm_list_push(mm_list* l, struct mm_seg* n)
+{
+    if(l->head && l->tail)
+    {
+        printf("There is a head and tail \n");
+        printf("Head addr: %p \n", l->head);
+        printf("Tail addr: %p \n", l->tail);
+        n->prev = l->tail;
+        l->tail->next = n;
+        l->tail = n;
+    }
+    else
+    {
+        if(l->head)
+        {
+            printf("There is at least a head \n");
+            l->head->next = n;
+            n->prev = n;
+            l->tail = n;
+        }
+        else
+        {
+            printf("There is no head or tail \n");
+            printf("Head addr: %p \n", l->head);
+            printf("Tail addr: %p \n", l->tail);
+            l->head = n;
+        }
+    }
+}
+
+void mm_list_pop(mm_list* l)
+{
+
+}
+
+void mm_list_deinit(struct mm_List* l)
+{
+
+}
 
 
 void mm_free(void* seg)
@@ -48,13 +94,29 @@ void mm_free(void* seg)
 
 int main(void)
 {
-    void* ptr_1 = mm_alloc(0);
-    void* ptr_2 = mm_alloc(16);
-    void* ptr_3 = mm_alloc(64);
+    mm_list list;
 
-    mm_free(ptr_1);
-    mm_free(ptr_2);
-    mm_free(ptr_3);
+    mm_list_init(&list);
+
+
+    printf("Head addr: %p \n", list.head);
+    printf("Tail addr: %p \n", list.tail);
+    // mm_list_push(&list, mm_alloc(64));
+    // printf("Value of list head: %p \n", list.head);
+    // printf("Value of list tail: %p \n", list.tail);
+    // mm_list_push(&list, mm_alloc(32));
+    // mm_list_push(&list, mm_alloc(8));
+    // mm_list_push(&list, mm_alloc(16));
+    // mm_list_push(&list, mm_alloc(24));
+
+
+    // void* ptr_1 = mm_alloc(0);
+    // void* ptr_2 = mm_alloc(16);
+    // void* ptr_3 = mm_alloc(64);
+    //
+    // mm_free(ptr_1);
+    // mm_free(ptr_2);
+    // mm_free(ptr_3);
 
 
     printf("End of test \n");
