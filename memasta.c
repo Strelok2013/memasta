@@ -37,28 +37,54 @@ void mm_list_init(struct mm_List *l)
 
 }
 
-void mm_list_push(mm_list* l, struct mm_seg* n)
+void mm_list_push(mm_list* l, struct mm_seg* a)
 {
-    if(l->head && l->tail)
+    mm_list_insert(l, l->tail, a);
+    // Also sane???
+}
+
+
+void mm_list_insert(mm_list* l, struct mm_seg* n, struct mm_seg* a)
+{
+    if(!l->head)
     {
-        n->prev = l->tail;
-        l->tail->next = n;
-        l->tail = n;
+        l->head = a;
+        return;
     }
     else
     {
-        if(l->head)
+        if(!l->tail)
         {
-            l->head->next = n;
-            n->prev = n;
-            l->tail = n;
-        }
-        else
-        {
-            l->head = n;
+            l->head->next = a;
+            a->prev = l->head;
+            l->tail = a;
+            return;
         }
     }
+
+    if(n == l->head)
+    {
+        l->head->prev = a;
+        a->next = l->head;
+        l->head = a;
+        return;
+    }
+    if(n == l->tail)
+    {
+        l->tail->next = a;
+        a->prev = l->tail;
+        l->tail =  a;
+        return;
+    }
+
+    n->next->prev = a;
+    a->next = n->next;
+    n->next = a;
+    a->prev = n;
+    // Hopefully its sane...
+
 }
+
 
 void mm_list_pop(mm_list* l)
 {
@@ -66,10 +92,20 @@ void mm_list_pop(mm_list* l)
     {
         mm_free(l->head);
         l->head = NULL;
+        return;
     }
-    l->tail = l->tail->prev;
-    l->tail->next = NULL;
+    if(l->tail->prev == l->head)
+    {
+
+        mm_free(l->tail);
+        l->head->next = NULL;
+        l->tail = NULL;
+        return;
+    }
+    void* tmp = l->tail->prev;
     mm_free(l->tail);
+    l->tail = tmp;
+    l->tail->next = NULL;
 }
 
 void mm_list_deinit(struct mm_List* l)
@@ -86,7 +122,7 @@ void mm_free(void* seg)
         return;
     }
     struct mm_seg *seg_p = seg;
-    seg_p->next = NULL; // this shouldn't be done here methinks
+    // seg_p->next = NULL; // this shouldn't be done here methinks
     printf("Freeing %zu bytes of memory\n", seg_p->size);
     free(seg);
     seg = 0;
@@ -108,11 +144,13 @@ int main(void)
     mm_list_push(&list, mm_alloc(8));
     mm_list_push(&list, mm_alloc(16));
     mm_list_push(&list, mm_alloc(24));
-    // mm_list_pop(&list);
-    // mm_list_pop(&list);
-    // mm_list_pop(&list);
-    // mm_list_pop(&list);
-    // mm_list_pop(&list);
+    mm_list_pop(&list);
+    mm_list_pop(&list);
+    mm_list_pop(&list);
+    mm_list_pop(&list);
+    mm_list_pop(&list);
+    // printf("Addr of head->next: %p \n", list.head->next);
+    // printf("Addr of tail: %p \n", list.tail);
     // void* ptr_1 = mm_alloc(0);
     // void* ptr_2 = mm_alloc(16);
     // void* ptr_3 = mm_alloc(64);

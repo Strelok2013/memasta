@@ -28,5 +28,7 @@ void mm_list_deinit(struct mm_List *l);
 
 void mm_list_push(mm_list *l, struct mm_seg *n);
 
+void mm_list_insert(mm_list *l, struct mm_seg *n, struct mm_seg *a);
+
 void mm_list_pop(mm_list *l);
 
